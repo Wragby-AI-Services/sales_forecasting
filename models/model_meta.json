@@ -1,0 +1,28 @@
+{
+  "model": "RandomForestRegressor",
+  "params": {
+    "n_estimators": 400,
+    "max_depth": 3,
+    "min_samples_leaf": 1,
+    "max_features": 0.8,
+    "random_state": 42
+  },
+  "feature_cols": [
+    "Year",
+    "Month",
+    "Quarter",
+    "Month_sin",
+    "Month_cos",
+    "IsHoliday",
+    "Sales_lag_1",
+    "Sales_lag_2",
+    "Sales_lag_3",
+    "Sales_lag_12",
+    "Rolling_mean_3",
+    "Rolling_std_3",
+    "Rolling_mean_6",
+    "Sales_diff_prev",
+    "Sales_pct_prev"
+  ],
+  "train_rows": 36
+}

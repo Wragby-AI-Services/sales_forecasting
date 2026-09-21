@@ -39,3 +39,9 @@ Sales Forecasting Project
 
 13. Blocker: The model-saving cell in the modelling notebook was retraining and saving the untuned XGBoost model instead of the tuned one, and had stopped saving model_meta.json and residual_std — leaving the deployed app out of sync with the actual best-performing model
     Resolution: Flagged the mismatch so the saved model artifact can be corrected to match the tuned XGBoost model actually reported as best in the results.
+
+14. Blocker: On the deployed Streamlit app, the forecast result table stretched across the full page width (use_container_width=True), which looked oversized and made the two-column result hard to scan.
+    Resolution: Switched the dataframe to width="content" and added compact column config (Date shown as "MMM YYYY", Forecast as a comma-formatted number with a narrow column width) so the table hugs its content instead of filling the wide layout.
+
+15. Blocker: The forecast line chart's X-axis repeated each year multiple times — every monthly tick printed the same year label (e.g. 2015, 2015, 2015, …), cluttering the axis under the History and Forecast lines.
+    Resolution: Passed explicit axis tick values via alt.Axis(values=…), one per calendar year placed at that year's first data point, so each year appears exactly once beneath the displayed actual and forecast graphs.

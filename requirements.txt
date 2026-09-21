@@ -9,3 +9,7 @@ streamlit>=1.30
 # Full pipeline only (preprocess / modelling / tuning)
 statsmodels>=0.14
 pmdarima>=2.0
+
+# Figures (src/make_figures.py)
+matplotlib>=3.8
+seaborn>=0.13

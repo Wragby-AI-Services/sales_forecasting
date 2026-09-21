@@ -55,6 +55,42 @@ def line_chart(df_wide, height=420):
     )
 
 
+def interpret_forecast(history, out):
+    """Return markdown bullet strings interpreting the forecast table."""
+    n = len(out)
+    total = out["Forecast"].sum()
+    avg = out["Forecast"].mean()
+
+    peak = out.loc[out["Forecast"].idxmax()]
+    trough = out.loc[out["Forecast"].idxmin()]
+
+    recent_avg = history["Sales"].tail(6).mean()
+    vs_recent = (avg - recent_avg) / recent_avg * 100 if recent_avg else 0.0
+
+    bullets = [
+        f"**Total forecast:** ${total:,.0f} across the next {n} month(s).",
+        f"**Average monthly forecast:** ${avg:,.0f} — {vs_recent:+.1f}% vs. the "
+        f"trailing 6-month historical average (${recent_avg:,.0f}).",
+        f"**Peak month:** {peak['Date']:%B %Y} at ${peak['Forecast']:,.0f}.",
+        f"**Trough month:** {trough['Date']:%B %Y} at ${trough['Forecast']:,.0f}.",
+    ]
+
+    if n > 1:
+        first = out["Forecast"].iloc[0]
+        last = out["Forecast"].iloc[-1]
+        change_pct = (last - first) / abs(first) * 100 if first else 0.0
+        diffs = out["Forecast"].diff().dropna()
+        up = int((diffs > 0).sum())
+        down = int((diffs < 0).sum())
+        bullets.append(
+            f"**Direction over the horizon:** {last - first:+,.0f} "
+            f"({change_pct:+.1f}%), with {up} up / {down} down "
+            "month-over-month moves."
+        )
+
+    return bullets
+
+
 months = st.slider("Months to forecast ahead", min_value=1, max_value=24, value=6)
 
 if st.button("Generate forecast", type="primary"):
@@ -80,6 +116,25 @@ if st.button("Generate forecast", type="primary"):
                 "Forecast ($)", format="%,.2f", width="small"
             ),
         },
+    )
+
+    csv_data = out.assign(
+        Date=out["Date"].dt.strftime("%Y-%m-%d")
+    ).to_csv(index=False)
+    st.download_button(
+        "Download forecast (CSV)",
+        data=csv_data,
+        file_name=f"sales_forecast_{months}_months.csv",
+        mime="text/csv",
+    )
+
+    st.subheader("Interpretation")
+    for bullet in interpret_forecast(history, out):
+        st.markdown(f"- {bullet}")
+    st.caption(
+        "Point estimates from the tuned Random Forest model "
+        "(walk-forward validation MAPE ≈ 22.8%). Actuals can vary — "
+        "no prediction intervals are shown here."
     )
 else:
     st.subheader("Historical monthly sales")

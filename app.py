@@ -18,8 +18,7 @@ BASE = os.path.dirname(os.path.abspath(__file__))
 HISTORY = os.path.join(BASE, "data", "monthly_sales.csv")
 
 st.set_page_config(page_title="Sales Forecast", layout="wide")
-st.title("📈 Monthly Sales Forecast")
-st.caption("Random Forest · walk-forward tuned · 48 months of history (2015–2018)")
+st.title(" Monthly Sales Forecast")
 
 history = pd.read_csv(HISTORY, parse_dates=["Date"])
 
@@ -82,12 +81,7 @@ def interpret_forecast(history, out):
         diffs = out["Forecast"].diff().dropna()
         up = int((diffs > 0).sum())
         down = int((diffs < 0).sum())
-        bullets.append(
-            f"**Direction over the horizon:** {last - first:+,.0f} "
-            f"({change_pct:+.1f}%), with {up} up / {down} down "
-            "month-over-month moves."
-        )
-
+        
     return bullets
 
 
@@ -131,11 +125,6 @@ if st.button("Generate forecast", type="primary"):
     st.subheader("Interpretation")
     for bullet in interpret_forecast(history, out):
         st.markdown(f"- {bullet}")
-    st.caption(
-        "Point estimates from the tuned Random Forest model "
-        "(walk-forward validation MAPE ≈ 22.8%). Actuals can vary — "
-        "no prediction intervals are shown here."
-    )
 else:
     st.subheader("Historical monthly sales")
     hist_df = history.set_index("Date").rename(columns={"Sales": "Sales"})

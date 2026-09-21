@@ -29,11 +29,21 @@ def line_chart(df_wide, height=420):
     long = df_wide.reset_index().melt(
         id_vars="Date", var_name="Series", value_name="Value"
     )
+    # Explicit ticks: exactly one per calendar year, placed at that year's
+    # first data point. This stops the same year from repeating across the
+    # monthly ticks on the temporal axis.
+    year_ticks = [
+        df_wide.index[df_wide.index.year == year].min()
+        for year in sorted(df_wide.index.year.unique())
+    ]
     return (
         alt.Chart(long)
         .mark_line(point=True)
         .encode(
-            x=alt.X("Date:T", axis=alt.Axis(format="%Y", title="Year")),
+            x=alt.X(
+                "Date:T",
+                axis=alt.Axis(format="%Y", title="Year", values=year_ticks),
+            ),
             y=alt.Y("Value:Q", title="Sales ($)"),
             color=alt.Color("Series:N", title=None),
             tooltip=[
@@ -59,7 +69,18 @@ if st.button("Generate forecast", type="primary"):
         axis=1,
     )
     st.altair_chart(line_chart(chart_df), use_container_width=True)
-    st.dataframe(out.set_index("Date"), use_container_width=True)
+    st.dataframe(
+        out.set_index("Date"),
+        width="content",
+        column_config={
+            "Date": st.column_config.DateColumn(
+                "Date", format="MMM YYYY", width="small"
+            ),
+            "Forecast": st.column_config.NumberColumn(
+                "Forecast ($)", format="%,.2f", width="small"
+            ),
+        },
+    )
 else:
     st.subheader("Historical monthly sales")
     hist_df = history.set_index("Date").rename(columns={"Sales": "Sales"})

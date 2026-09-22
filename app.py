@@ -67,11 +67,7 @@ def interpret_forecast(history, out):
     vs_recent = (avg - recent_avg) / recent_avg * 100 if recent_avg else 0.0
 
     bullets = [
-        f"**Total forecast:** ${total:,.0f} across the next {n} month(s).",
-        f"**Average monthly forecast:** ${avg:,.0f} — {vs_recent:+.1f}% vs. the "
-        f"trailing 6-month historical average (${recent_avg:,.0f}).",
-        f"**Peak month:** {peak['Date']:%B %Y} at ${peak['Forecast']:,.0f}.",
-        f"**Trough month:** {trough['Date']:%B %Y} at ${trough['Forecast']:,.0f}.",
+        f"**Total forecast:** ${total:,.0f} across the next {n} month(s)."
     ]
 
     if n > 1:
